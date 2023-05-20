@@ -118,7 +118,7 @@ def main():
     
     def valores_de_n(msg):
         rr_object.relacion = msg.text
-        msg = bot.send_message(msg.chat.id, "¿Desde que valor de \"n\" empieza su serie %s?" % u'\U0001F914')
+        msg = bot.send_message(msg.chat.id, "¿Desde que valor de \"n\" empiezan las condiciones iniciales %s?" % u'\U0001F914')
         bot.register_next_step_handler(msg, condiciones_iniciales)
     
     def condiciones_iniciales(msg):
@@ -129,7 +129,7 @@ def main():
             max_grado = int(max(aux))
             for i in range(max_grado):
                 text += f"f({i + int(rr_object.n)}) "
-            msg = bot.send_message(msg.chat.id, f"Digite las condiciones {text.strip()}, seguida de comas en orden acendente\n"
+            msg = bot.send_message(msg.chat.id, f"Digite las condiciones {text.strip()}, seguida(s) de comas en orden acendente\n"
                                    "Por ejemplo: 1, 3 siendo 1 = f(0) y 3 = f(1)" )
             bot.register_next_step_handler(msg, mostrar_formula)
         except:
