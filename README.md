@@ -8,6 +8,6 @@ Para su debido funcionamiento se deben de instalar las librerias descritas en el
 
 ##  Integrantes:
 
-### Del toro Rodriguez Maria Alejandra
-### Meza Santiago David Antonio
-### Rodriguez Carreño Aaron Jose
+#### - Del toro Rodriguez Maria Alejandra
+#### - Meza Santiago David Antonio
+#### - Rodriguez Carreño Aaron Jose
