@@ -1,13 +1,9 @@
 #%%
 from private import BotVariables
 import telebot
-from telebot.types import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
-from telebot.types import ForceReply
+from telebot.types import ReplyKeyboardMarkup
 from funciones import Constelaciones, RRLHCCC
 from bot_funcion import InlineKeyboard
-from PIL import Image
-from io import BytesIO
-import io
 
 Variables = BotVariables()
 bot = telebot.TeleBot(Variables.TOKEN)
@@ -18,9 +14,9 @@ def main():
 
     @bot.message_handler(commands=["menu"])
     def cmd_menu(message):
-        bot.send_message(message.chat.id, "Selecciona una opcion del menu", reply_markup = InlineKeyboard.markup_inline_menu())    
-    
-    
+        bot.send_message(message.chat.id, "Selecciona una opcion del menu", reply_markup = InlineKeyboard.markup_inline_menu())
+
+
     @bot.message_handler(commands=["ayuda"])
     def cmd_ayuda(message):
         bot.send_message(message.chat.id, "--------- COMANDOS GENERALES ---------\n\n"
@@ -76,7 +72,7 @@ def main():
         constelaciones_object.generar_estrellas_y_constelaciones(constelaciones_object.get_nombre_constelaciones())
         foto = open("Cielo_Estrellado_Constelaciones.png", "rb")
         bot.send_photo(call.from_user.id, foto, "Cielo Estrellado con Constelaciones %s" % u'\U0001F30C')
-    
+
     def cmd_RR_menu(call):
         msg = bot.send_message(call.from_user.id, "Ingrese su relacion de relacion de recurrencia de la fomra "
                                "f(n) = C1*f(n - 1) + ... + g(n)")
@@ -89,7 +85,7 @@ def main():
         constelaciones_object.generar_estrellas()
         foto = open("Cielo_Estrellado.png", "rb")
         bot.send_photo(message.chat.id, foto, "Cielo Estrellado %s" % u'\U0001F4AB')
-    
+
     @bot.message_handler(commands=["constelacion"])
     def cmd_constelacion(message):
         markup = ReplyKeyboardMarkup(one_time_keyboard=True, input_field_placeholder="Escoje una constelacion", resize_keyboard=True)
@@ -102,7 +98,7 @@ def main():
         constelaciones_object.generar_estrellas_y_constelaciones(constelaciones_object.get_nombre_constelaciones())
         foto = open("Cielo_Estrellado_Constelaciones.png", "rb")
         bot.send_photo(message.chat.id, foto, "Cielo Estrellado con Constelaciones %s" % u'\U0001F30C')
-    
+
     @bot.message_handler(commands=["RR"])
     def cmd_RR(message):
         msg = bot.send_message(message.chat.id, "Ingrese su relacion de relacion de recurrencia de la fomra "
@@ -115,12 +111,12 @@ def main():
             bot.send_message(message.chat.id, "Comando no disponible. Para mas informacion ingrese el comando de /ayuda")
         else:
             bot.send_message(message.chat.id, "Lo siento, no puedo interpretar tu mensaje. Para mas informacion ingrese el comando de /ayuda")
-    
+
     def valores_de_n(msg):
         rr_object.relacion = msg.text
         msg = bot.send_message(msg.chat.id, "¿Desde que valor de \"n\" empiezan las condiciones iniciales %s?" % u'\U0001F914')
         bot.register_next_step_handler(msg, condiciones_iniciales)
-    
+
     def condiciones_iniciales(msg):
         try:
             text = ""
@@ -141,9 +137,13 @@ def main():
             text = msg.text.replace(" ", "")
             vec = text.split(",")
             rr_object.condiciones = [int(x) for x in vec]
-            rr_object.latex_img(rr_object.resolver_rrlhccc())
-            foto = open('latex_image.jpg', "rb")
-            bot.send_photo(msg.chat.id, foto, "Formula no recurrente encontrada")
+            res = rr_object.latex_img(rr_object.recurrencias_homogeneas(rr_object.relacion, rr_object.condiciones, rr_object.n))
+            if res:
+                foto = open('latex_image.jpg', "rb")
+                bot.send_photo(msg.chat.id, foto, "Formula no recurrente encontrada")
+            else:
+                bot.send_message(msg.chat.id, "Formula no recurrente encontrada\n\n"
+                f"f(n) = {rr_object.recurrencias_homogeneas(rr_object.relacion, rr_object.condiciones, rr_object.n)}")
         except:
             bot.send_message(msg.chat.id, "No se puede realizar la operacion con los datos suministrados. Por favor, intente ingresarlos correctamente.\n\n"
                              "Ten en cuenta que si ingresastes datos que supuestamente son correctos y sigue dando error, puede ser debido a raices imaginarias")
@@ -160,7 +160,6 @@ def main():
     bot.infinity_polling()
 
 if __name__ == "__main__":
-    print(f"Bot iniciado")
+    print("Bot iniciado")
     main()
-
 # %%
