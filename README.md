@@ -6,6 +6,17 @@ Este proyecto se encarga de ejecutar las funcionalidades descritas en el entrega
 
 Para su debido funcionamiento se deben de instalar las librerias descritas en el documento "requirements.txt" utilizando el comando py -m pip install -r "requirements.txt" (Para versiones de Python >= 3.11)
 
+##  Librerias y modulos utilizados:
+
+- Sympy
+- PIL
+- telebot
+- BytesIO
+- requests
+- re
+- matplotlib
+- numpy
+
 ##  Integrantes:
 
 #### - Del toro Rodriguez Maria Alejandra
