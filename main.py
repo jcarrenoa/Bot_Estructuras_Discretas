@@ -156,7 +156,7 @@ def main():
             bot.send_photo(msg.chat.id, foto, f"Cielo Estrellado con la Constelacion de nombre {msg.text} " + "%s" % u'\U0001F30C')
         except:
             bot.send_message(msg.chat.id, "Constelacion no encontrada. Intente seleccionar alguna constelacion disponible en el menu desplegable ubicado en la parte inferior derecha")
-
+    
     bot.infinity_polling()
 
 if __name__ == "__main__":

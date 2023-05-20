@@ -64,7 +64,7 @@ class Constelaciones():
         for key, values in dic_c.items():
             for value in values:
                 print([dic_estrellas[key][0], dic_estrellas[value][0]], [dic_estrellas[key][1], dic_estrellas[value][1]])
-                plt.plot([dic_estrellas[key][0], dic_estrellas[value][0]], [dic_estrellas[key][1], dic_estrellas[value][1]], c = "olive", linewidth = 0.99)
+                plt.plot([dic_estrellas[key][0], dic_estrellas[value][0]], [dic_estrellas[key][1], dic_estrellas[value][1]], c = "olive", linewidth = 1.8)
         plt.savefig("Cielo_Estrellado_{constelacion}.png")
 
     def generar_estrellas_y_constelaciones(self, nombre_constelaciones):
@@ -76,7 +76,7 @@ class Constelaciones():
             constelacion = self.dic_constelaciones(f"{nc}.txt")
             for key, values in constelacion.items():
                 for value in values:
-                    plt.plot([self.__dic_estrellas[key][0], self.__dic_estrellas[value][0]], [self.__dic_estrellas[key][1], self.__dic_estrellas[value][1]], c = "olive", linewidth = 0.99)
+                    plt.plot([self.__dic_estrellas[key][0], self.__dic_estrellas[value][0]], [self.__dic_estrellas[key][1], self.__dic_estrellas[value][1]], c = "olive", linewidth = 1.05)
         if len(nombre_constelaciones) == 1:
             plt.savefig(f"Cielo_Estrellado_{nombre_constelaciones[0]}.png")
         else:
@@ -87,10 +87,21 @@ class Constelaciones():
 
 class RRLHCCC():
 
+    #Constructor de la clase RRLHCCC
+    
+    #ATRIBUTOS:
+
+    #__relacion = Atributo privado que se le pasara la relacion de recurrencia
+    #a evaluar como un str
+    #__n = Atributo privado que se le pasara el valor por el que empiezan las condiciones iniciales
+    #__condiciones = Atributo privado que se le pasara una lista con las condiciones iniciales en orden ascendente
+
     def __init__(self) -> None:
        self.__relacion = None
        self.__n = None
        self.__condiciones = None
+
+    #getters y setters de los atributos de la clase
 
     @property
     def relacion(self):
@@ -116,43 +127,79 @@ class RRLHCCC():
     def n(self, n):
        self.__n = n
 
-    #Se sacan los frados de cada f y se pasa retorna como una dupla "(f(n-x), x)""
+    #Se sacan los grados de cada f y se pasa retorna como una dupla "(f(n-x), x)""
+    #PARAMETROS:
+    #cadena = Relacion de recurrencia a evaluar los grados
     def sacar_grado(self, cadena):
+        #Expresion regural para identificar los f(n-k)
         regex = fr'f\(n\s*-\s*[0-9]+\)'
+        #Nos devuelve cada f(n-k)
         resultado = re.findall(regex, cadena.replace(" ", ""))
         vec = []
         for i in resultado:
+          #Agrega en un vector el f(n-k) y k como una dupla
           vec.append([i, i[4:-1]])
         return (vec)
-     
+    
+    #Funcino que resuelve una relacion de recurrencia segun sus terminos y condiciones iniciales
+    #PARAMETROS:
+    #terminos = Terminos de la relacion de recurrencia (lista)
+    #condiciones = Condiciones iniciales de la relacion de recurrencia (diccionario) 
     def resolver_homogenia(self, terminos, condiciones):
+      #Define la variable f como funcion si encuentra una "f" en la ecuacion
       f = sp.Function('f')
+      #Define la variable n como una variable simbolica si encuentra "n" en la ecuacion
       n = sp.symbols('n')
+      #Define una funcion como f(n) siendo f una funcion y n una variable simbolica
       fun = f(n)
       for termino in terminos:
+          #Cumple la funcion de restarle los terminos que se encuentran al lado derecho de f(n) en la relacion de recurrencia
           fun = fun - termino
+      #Soluciona la relacion de recurrencia segun los parametros ingresados
       solucion = sp.rsolve(fun, f(n), condiciones)
       return solucion
     
+    #Funcion que da el resultado de la ecuacion no recurrente como str
+    #PARAMETROS:
+    #recurrencia = Relacion de recurrencia a evaluar (str)
+    #val_inical = Condiciones iniciales de la recurrencia (lista)
+    #n = Valor por el cual empiezan las condiciones iniciales (int)
     def recurrencias_homogeneas(self, recurrencia, val_iniciales, n):
+      #Convierte la cadena de la relacion de recurrencia a una expresion de sympy
       parse_rr = sp.parse_expr(recurrencia)
+      #Diccionario con los valores iniciales de la relacion
       dic_f = {}
       i = 0
+      #For each que recorre todos los valores iniciales
       for valor_f in val_iniciales:
+        #Guarda en una variabel temporal el f(k) (condicion), y la pasa a una expresion de sympy
         temp_f = sp.parse_expr(f"f({n + i})")
+        #Guarda en un diccionario el valor inicial de la condicion inicial
+        #temp_f = Llave
+        #valor_f = Valor
         dic_f[temp_f] = int(valor_f)
         i += 1
+      #guarda los terminos por separados de la variable parse_rr
       terminos_rr = parse_rr.args
+      #Llama la funcion resolver_homogenia
       fn_homogen = self.resolver_homogenia(terminos_rr, dic_f)
+      #devuelve el resulado de lo anterior como un str
       return str(fn_homogen)
 
-    def latex_img(self, equation):
-        equation_latex = sp.latex(sp.parse_expr(equation))
-        response = requests.get('http://latex.codecogs.com/png.latex?\dpi{{500}} {formula}'.format(formula=equation_latex))
+    #Funcion que sirve para guardar la funcion no recurrente encontrada como imagen
+    #PARAMETROS:
+    #equation = Ecuacion que se pasara a tipo imagen (str)
+    def latex_img(self, ecuacion_rr):
+        #Se convierte la ecuacion a una expresion de sympy
+        latex_rr = sp.latex(sp.parse_expr(ecuacion_rr))
+        #Variable que guarda la respuesta de la pagina que covierte la funcion a formato latex en imagen
+        response = requests.get(f'http://latex.codecogs.com/png.latex?\dpi{{500}} {latex_rr}')
+        #Si la respuesta de la pagina es satisfactoria nos convierte la respuesta de la pagina en una imagen
+        #y devuelve True. Sino devuelve False y no hace ninguna operacion
         if response.status_code == 200:
             imagen_bytes = BytesIO(response.content)
             image = Image.open(imagen_bytes)
-            image = image.convert('RGB')  # Convertir a formato RGB para guardar como JPG
+            image = image.convert('RGB')
             image_bytes_jpg = BytesIO()
             image.save(image_bytes_jpg, format='JPEG')
             image_bytes_jpg.seek(0)
