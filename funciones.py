@@ -9,79 +9,120 @@ from PIL import Image
 
 class Constelaciones():
 
+    #Constructor de la clase Constelaciones
+
+    #ATRIBUTOS:
+
+    #__nombre_constelaciones = Atributo privado que contiene todalas las constelaciones que se encuentran en los archivos (lista)
+    #__estrellas = Atributo privado con las coordenadas de todas las estrellas (lista)
+    #__dic_estrellas = Atributo privado con las coordenadas de las estrellas con nombre (diccionario)
+    #__coordemadas = Atributo privado con lsolo las coordenadas he intensidad de todas las estrellas (lista)
     def __init__(self, nombre_archivo) -> None:
         self.__nombre_constelaciones = ["Boyero", "Casiopea", "Cazo", "Cygnet", "Geminis", "Hydra", 
                              "OsaMayor", "OsaMenor"]
         self.__estrellas, self.__dic_estrellas = self.estrellas(nombre_archivo)
         self.__coordenadas = np.array([[float(x[0]), float(x[1]), float(x[3])/30] for x in self.__estrellas])
-        
+    
+    #Funcion que sirve para retornar las coordenadas de todas las estrellas y un diccionario con solo las estrellas con nombres
+    #PARAMETROS:
+    #nombre_archivo = Parametro que contiene el nombre del archivo de todas las estrellas (str)
     def estrellas(self, nombre_archivo):
         stars = []
         dic = {}
+        #Abre el archivo segun el nombre que se mando por parametro
         with open(f"Archivos/{nombre_archivo}", "r") as archivo:
+            #For each que lee linea por linea del archivo
             for linea in archivo:
+                #split de la linea segun los espacios
                 vec = linea.split(" ")
+                #Almacena en un vector temporal solo las coordenadas, la intensidad y codigo de la estrella
                 temp = [vec[0], vec[1], vec[3], vec[4]]
                 text = ""
+                #Ciclo encargado de almacenar en una variable temporal de texto los nombres de las estrellas si es que tienen
                 for i in range(6, len(vec)):
                     text += f"{vec[i]} "
+                #Condicional para saber si tiene nombre o no una estrella
                 if text != "":
+                    #split del texto segun un punto y coma. Si tiene un punto y como es que la estrella tiene dos nombres
                     nombres = text.split(";")
+                    #Ciclo para agregar todos los nombres que contenga una estrella
                     for estrella in nombres:
                         dic[estrella.strip()] = (float(temp[0]), float(temp[1]))
                 stars.append(temp)
         return stars, dic
 
+    #Funcion que da como resultado un diccionarios con conecciones de las estrellas dependiendo de la constelacion que se quiera hallar
+    #PARAMETRO:
+    #txt = Nombre de la constelacion de las que se hallaran las relaciones (str)
     def dic_constelaciones(self, txt):
         vec = []
         aux = []
+        #Abre el archivo segun el nombre que se mande como parametro
         with open(f"Archivos/{txt}", "r") as archivo:
+            #For each que lee linea por linea del archivo
             for linea in archivo:
+                #split de una linea segun las comas
                 splt = linea.split(",")
                 splt[-1] = splt[-1].strip()
                 vec.append(splt)
+                #For each que cumple la funcion de agregar las relaciones que se encuentren en un vector auxiliar
                 for x in splt:
                     aux.append(x.strip())
+            #agrega todas las estrellas encontradas en un diccionario
             dic = {start:[] for start in aux}
+            #For each que agrega en el diccionario todas las relaciones de todas las estrellas
             for union in vec:
                 dic[union[0]] += [union[1]]
                 dic[union[1]] += [union[0]]
         return dic
 
+    #Funcion que se encarga de graficar todas las estrellas
     def generar_estrellas(self):
         fig, ax = plt.subplots()
+        #Se configura el estilo de la grafica (Fondo negro y sin ejes)
         plt.style.use('dark_background')
+        #Se generan todas las estrellas
         plt.scatter(self.__coordenadas[:,0], self.__coordenadas[:,1], c="white", s = self.__coordenadas[:,2])
         ax.axis('off')
+        #Se guarda la imagen de las estrellas
         plt.savefig("Cielo_Estrellado.png")
 
     def generar_estrellas_y_constelacion(self, constelacion, dic_estrellas):
         fig, ax = plt.subplots()
+        #Se configura el estilo de la grafica (Fondo negro y sin ejes)
         plt.style.use('dark_background')
         ax.axis('off')
+        #Se generan todas las estrellas
         ax.scatter(self.__coordenadas[:,0], self.__coordenadas[:,1], c="white", s = self.__coordenadas[:,2])
         dic_c = self.dic_constelaciones(f"{constelacion}.txt")
+        #Genera las figuras de la constelacion pasada como parametro
         for key, values in dic_c.items():
             for value in values:
                 print([dic_estrellas[key][0], dic_estrellas[value][0]], [dic_estrellas[key][1], dic_estrellas[value][1]])
                 plt.plot([dic_estrellas[key][0], dic_estrellas[value][0]], [dic_estrellas[key][1], dic_estrellas[value][1]], c = "olive", linewidth = 1.8)
+        #Se guarda la imagen de las estrellas con la constelacion
         plt.savefig("Cielo_Estrellado_{constelacion}.png")
 
     def generar_estrellas_y_constelaciones(self, nombre_constelaciones):
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots
+        #Se configura el estilo de la grafica (Fondo negro y sin ejes)
         plt.style.use('dark_background')
         ax.axis('off')
+        #Se generan todas las estrellas
         ax.scatter(self.__coordenadas[:,0], self.__coordenadas[:,1], c="white", s = self.__coordenadas[:,2])
+        #Genera las figuras de todas las constelaciones
         for nc in nombre_constelaciones:
             constelacion = self.dic_constelaciones(f"{nc}.txt")
             for key, values in constelacion.items():
                 for value in values:
                     plt.plot([self.__dic_estrellas[key][0], self.__dic_estrellas[value][0]], [self.__dic_estrellas[key][1], self.__dic_estrellas[value][1]], c = "olive", linewidth = 1.05)
+        #Se guarda la imagen de las estrellas con todas las constelaciones
         if len(nombre_constelaciones) == 1:
             plt.savefig(f"Cielo_Estrellado_{nombre_constelaciones[0]}.png")
         else:
             plt.savefig("Cielo_Estrellado_Constelaciones.png")
 
+    #Funcion para obtener el atributo privado __nombre_constelaciones
     def get_nombre_constelaciones(self):
         return self.__nombre_constelaciones
 

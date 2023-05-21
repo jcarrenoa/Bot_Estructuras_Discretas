@@ -2,6 +2,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 class InlineKeyboard():
 
+    #Metodo que genera el menu de las opciones del bot
     @staticmethod
     def markup_inline_menu():
         markup = InlineKeyboardMarkup()
@@ -11,6 +12,7 @@ class InlineKeyboard():
                    InlineKeyboardButton("Cerrar", callback_data = "cerrar"))
         return markup
 
+    #Metodo que genera el menu de las opciones de las constelaciones
     @staticmethod
     def markup_inline_cielo():
         markup = InlineKeyboardMarkup()
