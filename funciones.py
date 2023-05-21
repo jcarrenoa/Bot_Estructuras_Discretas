@@ -104,12 +104,12 @@ class Constelaciones():
         plt.savefig("Cielo_Estrellado_{constelacion}.png")
 
     def generar_estrellas_y_constelaciones(self, nombre_constelaciones):
-        fig, ax = plt.subplots
+        fig, ax = plt.subplots()
         #Se configura el estilo de la grafica (Fondo negro y sin ejes)
         plt.style.use('dark_background')
         ax.axis('off')
         #Se generan todas las estrellas
-        ax.scatter(self.__coordenadas[:,0], self.__coordenadas[:,1], c="white", s = self.__coordenadas[:,2])
+        plt.scatter(self.__coordenadas[:,0], self.__coordenadas[:,1], c="white", s = self.__coordenadas[:,2])
         #Genera las figuras de todas las constelaciones
         for nc in nombre_constelaciones:
             constelacion = self.dic_constelaciones(f"{nc}.txt")
